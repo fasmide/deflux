@@ -25,9 +25,6 @@ func (d *Config) Init() error {
 }
 
 func (d *Config) discoverWebsocket() error {
-	return nil
-}
 
-func (d *Config) discover() error {
 	return nil
 }
