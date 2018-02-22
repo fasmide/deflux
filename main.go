@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"github.com/fasmide/deflux/deconz"
-	client "github.com/influxdb/influxdb/client/v2"
+	client "github.com/influxdata/influxdb/client/v2"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -98,7 +98,7 @@ func defaultConfiguration() *Configuration {
 	// this is the default configuration
 	c := Configuration{
 		Deconz: deconz.Config{
-			Addr:   "http://127.0.0.1:8080/api",
+			Addr:   "http://127.0.0.1:8080/",
 			APIKey: "change me",
 		},
 		Influxdb: client.HTTPConfig{
