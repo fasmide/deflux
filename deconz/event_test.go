@@ -26,8 +26,30 @@ func TestTemperatureEvent(t *testing.T) {
 		t.Logf("Could not assert to temperature event")
 		t.FailNow()
 	}
-	t.Logf("We parsed %+v", temp)
+
 	if temp.State.Temperature != 2062 {
+		t.Fail()
+	}
+}
+
+func TestHumidityEvent(t *testing.T) {
+
+	dec := json.NewDecoder(strings.NewReader(humidityEventPayload))
+
+	result, err := Parse(dec)
+	if err != nil {
+		t.Logf("Could not parse humidity: %s", err)
+		t.FailNow()
+	}
+
+	humidity, success := result.(*HumidityEvent)
+	if !success {
+		t.Logf("unable assert humidity event")
+		t.FailNow()
+	}
+
+	if humidity.State.Humidity != 2985 {
+		t.Logf("unexpected humidity value %d", humidity.State.Humidity)
 		t.Fail()
 	}
 }

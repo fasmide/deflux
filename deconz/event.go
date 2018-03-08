@@ -20,12 +20,26 @@ type Event struct {
 	ID       string `json:"id"`
 }
 
-// PresenceEvent represents a presence change
-type PresenceEvent struct {
+// State is for embedding into event states
+type State struct {
+	Lastupdated string
+}
+
+// HumidityEvent represents a presure change
+type HumidityEvent struct {
 	Event
 	State struct {
-		Lastupdated string
-		Presence    bool
+		State
+		Humidity int
+	}
+}
+
+// PressureEvent represents a presure change
+type PressureEvent struct {
+	Event
+	State struct {
+		State
+		Pressure int
 	}
 }
 
@@ -33,13 +47,13 @@ type PresenceEvent struct {
 type TemperatureEvent struct {
 	Event
 	State struct {
-		Lastupdated string
+		State
 		Temperature int
 	}
 }
 
-// Parse takes a decoder and returns apporiate format
-func Parse(dec *json.Decoder) (interface{}, error) {
+// Unmarshal decodes and returns apporiate event
+func Unmarshal([]byte b) (interface{}, error) {
 	dec.DisallowUnknownFields()
 
 	var a TemperatureEvent
@@ -48,10 +62,16 @@ func Parse(dec *json.Decoder) (interface{}, error) {
 		return &a, nil
 	}
 
-	var b PresenceEvent
+	var b PressureEvent
 	err = dec.Decode(&b)
 	if err == nil {
 		return &b, nil
+	}
+
+	var c HumidityEvent
+	err = dec.Decode(&c)
+	if err == nil {
+		return &c, nil
 	}
 
 	return nil, fmt.Errorf("Unable to parse %s", err)
