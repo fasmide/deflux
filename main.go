@@ -13,8 +13,10 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// YmlFileName is the filename
 const YmlFileName = "deflux.yml"
 
+// Configuration holds data for Deconz and influxdb configuration
 type Configuration struct {
 	Deconz   deconz.Config
 	Influxdb client.HTTPConfig

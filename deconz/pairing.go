@@ -9,6 +9,7 @@ import (
 	"net/url"
 )
 
+// APIKey is our apikey type
 type APIKey string
 
 type pairRequest struct {
