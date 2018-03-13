@@ -1,8 +1,9 @@
 package deconz
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 )
 
 // Event represents a deconz sensor event
@@ -52,8 +53,39 @@ type TemperatureEvent struct {
 	}
 }
 
+// FloodEvent respresents an event from a flood sensor
+type FloodEvent struct {
+	Event
+	State struct {
+		State
+		Lowbattery bool
+		Tampered   bool
+		Water      bool
+	}
+}
+
+// SmokeDetectorEvent resporesents an event from a smoke detector
+type SmokeDetectorEvent struct {
+	Event
+	State struct {
+		State
+		Fire       bool
+		Lowbattery bool
+		Tampered   bool
+	}
+}
+
 // Unmarshal decodes and returns apporiate event
-func Unmarshal([]byte b) (interface{}, error) {
+func Unmarshal(payload []byte) (interface{}, error) {
+
+	// in order to use DisallowUnknownFields we cannot use
+	// the typical json.Unmarshal we must create a decoder
+	// in order to pass the same payload multiple times, we
+	// create this buffer and write the payload again as we
+	// along...
+	buf := bytes.NewBuffer(payload)
+
+	dec := json.NewDecoder(buf)
 	dec.DisallowUnknownFields()
 
 	var a TemperatureEvent
@@ -62,11 +94,17 @@ func Unmarshal([]byte b) (interface{}, error) {
 		return &a, nil
 	}
 
+	// if the above failed, we must rewrite the same byte slice
+	// otherwise the decoder will just read EOF
+	buf.Write(payload)
+
 	var b PressureEvent
 	err = dec.Decode(&b)
 	if err == nil {
 		return &b, nil
 	}
+
+	buf.Write(payload)
 
 	var c HumidityEvent
 	err = dec.Decode(&c)
@@ -74,5 +112,21 @@ func Unmarshal([]byte b) (interface{}, error) {
 		return &c, nil
 	}
 
-	return nil, fmt.Errorf("Unable to parse %s", err)
+	buf.Write(payload)
+
+	var d FloodEvent
+	err = dec.Decode(&d)
+	if err == nil {
+		return &d, nil
+	}
+
+	buf.Write(payload)
+
+	var e SmokeDetectorEvent
+	err = dec.Decode(&e)
+	if err == nil {
+		return &e, nil
+	}
+
+	return nil, errors.New("payload did not match any of our event types")
 }
