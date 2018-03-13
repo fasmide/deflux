@@ -78,10 +78,9 @@ type SmokeDetectorEvent struct {
 // Unmarshal decodes and returns apporiate event
 // TODO: This should at least be made more robust, for example
 // passing {e: "something"} will make unmarshal return an somewhat
-// faulty TemperatureEvent
-//
-// which is not really what we want when dealing with say a
-// smoke detector
+// faulty TemperatureEvent...
+// this is not really what we want when dealing with
+// something like a smoke detector
 func Unmarshal(payload []byte) (interface{}, error) {
 
 	// in order to use DisallowUnknownFields we cannot use
