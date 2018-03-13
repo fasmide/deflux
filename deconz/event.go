@@ -7,13 +7,6 @@ import (
 )
 
 // Event represents a deconz sensor event
-// {
-//    "t": "event",
-//    "e": "changed",
-//    "r": "sensors",
-//    "id": "7",
-//    "state": { "presence": true }
-// }
 type Event struct {
 	Type     string `json:"t"`
 	Event    string `json:"e"`
