@@ -1,4 +1,4 @@
-package deconz
+package event
 
 import (
 	"errors"

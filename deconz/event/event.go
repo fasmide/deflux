@@ -1,7 +1,8 @@
-package deconz
+package event
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -28,12 +29,12 @@ func Parse(b []byte) (*Event, error) {
 	var e Event
 	err := json.Unmarshal(b, &e)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unmarshal event: %s", err)
+		return nil, fmt.Errorf("unable to unmarshal json: %s", err)
 	}
 
 	err = e.ParseState()
 	if err != nil {
-		return nil, fmt.Errorf("unable to unmarshal event: %s", err)
+		return nil, fmt.Errorf("unable to unmarshal state: %s", err)
 	}
 
 	return &e, nil
@@ -43,6 +44,9 @@ func Parse(b []byte) (*Event, error) {
 // on looking up the id though the TypeStore
 func (e *Event) ParseState() error {
 
+	if TypeStore == nil {
+		return errors.New("You the programmer did not set a TypeStore, i dont know what i'm parsing")
+	}
 	t, err := TypeStore.LookupType(e.ID)
 	if err != nil {
 		return fmt.Errorf("unable to lookup event id %d: %s", e.ID, err)

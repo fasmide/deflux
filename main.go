@@ -29,7 +29,19 @@ func main() {
 		outputDefaultConfiguration()
 		return
 	}
-	log.Printf("Config read, Addr is %s, bye", config.Deconz.Addr)
+
+	d := deconz.EventReader{Config: config.Deconz}
+	err = d.Dial()
+	if err != nil {
+		panic(err)
+	}
+	for {
+		e, err := d.ReadEvent()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("I have a message: %+v", e)
+	}
 }
 
 func loadConfiguration() (*Configuration, error) {
