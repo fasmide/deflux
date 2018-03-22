@@ -34,19 +34,22 @@ func (l *LookupImpl) LookupType(i int) (string, error) {
 	return "", errors.New("not found")
 }
 
+var decoder Decoder
+
 func TestMain(m *testing.M) {
-	TypeStore = &LookupImpl{Store: map[int]string{
+
+	decoder = Decoder{TypeStore: &LookupImpl{Store: map[int]string{
 		1: "ZHATemperature",
 		2: "ZHAHumidity",
 		3: "ZHAPressure",
 		5: "ZHAFire",
 		6: "ZHAWater",
 		7: "ZHASwitch",
-	}}
+	}}}
 	os.Exit(m.Run())
 }
 func TestSmokeDetectorNoFireEvent(t *testing.T) {
-	result, err := Parse([]byte(smokeDetectorNoFireEventPayload))
+	result, err := decoder.Parse([]byte(smokeDetectorNoFireEventPayload))
 	if err != nil {
 		t.Logf("unable to unmarshal smoke detector event: %s", err)
 		t.FailNow()
@@ -64,7 +67,7 @@ func TestSmokeDetectorNoFireEvent(t *testing.T) {
 }
 
 func TestUnknownEvent(t *testing.T) {
-	_, err := Parse([]byte(unknownEventPayload))
+	_, err := decoder.Parse([]byte(unknownEventPayload))
 	if err == nil {
 		t.Fail()
 	}
@@ -72,7 +75,7 @@ func TestUnknownEvent(t *testing.T) {
 
 func TestFloodDetectorEvent(t *testing.T) {
 
-	result, err := Parse([]byte(floodDetectorFloodDetectedEventPayload))
+	result, err := decoder.Parse([]byte(floodDetectorFloodDetectedEventPayload))
 	if err != nil {
 		t.Logf("Could not parse flood detector event: %s", err)
 		t.FailNow()
@@ -92,7 +95,7 @@ func TestFloodDetectorEvent(t *testing.T) {
 
 func TestPressureEvent(t *testing.T) {
 
-	result, err := Parse([]byte(pressureEventPayload))
+	result, err := decoder.Parse([]byte(pressureEventPayload))
 	if err != nil {
 		t.Logf("Could not parse pressure: %s", err)
 		t.FailNow()
@@ -111,7 +114,7 @@ func TestPressureEvent(t *testing.T) {
 
 func TestTemperatureEvent(t *testing.T) {
 
-	result, err := Parse([]byte(temperatureEventPayload))
+	result, err := decoder.Parse([]byte(temperatureEventPayload))
 	if err != nil {
 		t.Logf("Could not parse temperature: %s", err)
 		t.FailNow()
@@ -130,7 +133,7 @@ func TestTemperatureEvent(t *testing.T) {
 
 func TestHumidityEvent(t *testing.T) {
 
-	result, err := Parse([]byte(humidityEventPayload))
+	result, err := decoder.Parse([]byte(humidityEventPayload))
 	if err != nil {
 		t.Logf("Could not parse humidity: %s", err)
 		t.FailNow()
@@ -149,7 +152,7 @@ func TestHumidityEvent(t *testing.T) {
 
 func TestSwitchEvent(t *testing.T) {
 
-	result, err := Parse([]byte(switchSensorEventPayload))
+	result, err := decoder.Parse([]byte(switchSensorEventPayload))
 	if err != nil {
 		t.Logf("Could not parse switch event: %s", err)
 		t.FailNow()

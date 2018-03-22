@@ -2,12 +2,8 @@ package event
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 )
-
-// TypeStore is used to lookup what event to parse from an device ID
-var TypeStore TypeLookuper
 
 // TypeLookuper is the interface that we require to lookup types from id's
 type TypeLookuper interface {
@@ -24,15 +20,20 @@ type Event struct {
 	State    interface{}
 }
 
+// Decoder is able to decode deCONZ events
+type Decoder struct {
+	TypeStore TypeLookuper
+}
+
 // Parse parses events from bytes
-func Parse(b []byte) (*Event, error) {
+func (d *Decoder) Parse(b []byte) (*Event, error) {
 	var e Event
 	err := json.Unmarshal(b, &e)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshal json: %s", err)
 	}
 
-	err = e.ParseState()
+	err = e.ParseState(d.TypeStore)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshal state: %s", err)
 	}
@@ -42,12 +43,9 @@ func Parse(b []byte) (*Event, error) {
 
 // ParseState tries to unmarshal the appropriate state based
 // on looking up the id though the TypeStore
-func (e *Event) ParseState() error {
+func (e *Event) ParseState(tl TypeLookuper) error {
 
-	if TypeStore == nil {
-		return errors.New("You the programmer did not set a TypeStore, i dont know what i'm parsing")
-	}
-	t, err := TypeStore.LookupType(e.ID)
+	t, err := tl.LookupType(e.ID)
 	if err != nil {
 		return fmt.Errorf("unable to lookup event id %d: %s", e.ID, err)
 	}

@@ -1,6 +1,7 @@
 package event
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -10,6 +11,8 @@ import (
 // Reader represents a deconz server device
 type Reader struct {
 	WebsocketAddr string
+	TypeStore     TypeLookuper
+	decoder       *Decoder
 	conn          *websocket.Conn
 }
 
@@ -17,12 +20,19 @@ type Reader struct {
 func (r *Reader) Dial() error {
 
 	// // if wsAddr is empty, discover it..
-	// if d.Config.wsAddr == "" {
-	// 	err := d.Config.discoverWebsocket()
+	// if r.Config.wsAddr == "" {
+	// 	err := r.Config.discoverWebsocket()
 	// 	if err != nil {
 	// 		return fmt.Errorf("unable to dail websocket: %s", err)
 	// 	}
 	// }
+
+	if r.TypeStore == nil {
+		return errors.New("cannot dial without a TypeStore to lookup events from")
+	}
+
+	// create a decoder with the typestore
+	r.decoder = &Decoder{TypeStore: r.TypeStore}
 
 	// connect
 	var err error
@@ -35,6 +45,7 @@ func (r *Reader) Dial() error {
 
 // ReadEvent reads, parses and returns the next event
 func (r *Reader) ReadEvent() (*Event, error) {
+
 	_, message, err := r.conn.ReadMessage()
 	if err != nil {
 		return nil, fmt.Errorf("event read error: %s", err)
@@ -42,7 +53,7 @@ func (r *Reader) ReadEvent() (*Event, error) {
 
 	log.Printf("recv: %s", message)
 
-	e, err := Parse(message)
+	e, err := r.decoder.Parse(message)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse message: %s", err)
 	}
