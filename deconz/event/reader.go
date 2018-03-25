@@ -19,14 +19,6 @@ type Reader struct {
 // Dial connects connects to deconz, use ReadEvent to recieve events
 func (r *Reader) Dial() error {
 
-	// // if wsAddr is empty, discover it..
-	// if r.Config.wsAddr == "" {
-	// 	err := r.Config.discoverWebsocket()
-	// 	if err != nil {
-	// 		return fmt.Errorf("unable to dail websocket: %s", err)
-	// 	}
-	// }
-
 	if r.TypeStore == nil {
 		return errors.New("cannot dial without a TypeStore to lookup events from")
 	}
@@ -38,7 +30,7 @@ func (r *Reader) Dial() error {
 	var err error
 	r.conn, _, err = websocket.DefaultDialer.Dial(r.WebsocketAddr, nil)
 	if err != nil {
-		return fmt.Errorf("unable to dail websocket: %s", err)
+		return fmt.Errorf("unable to dail %s: %s", r.WebsocketAddr, err)
 	}
 	return nil
 }

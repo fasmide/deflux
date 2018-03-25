@@ -13,8 +13,8 @@ type API struct {
 	Config Config
 }
 
-// GetSensors returns a map of sensors
-func (a *API) GetSensors() (*Sensors, error) {
+// Sensors returns a map of sensors
+func (a *API) Sensors() (*Sensors, error) {
 
 	url := fmt.Sprintf("%s/%s/sensors", a.Config.Addr, a.Config.APIKey)
 	resp, err := http.Get(url)
@@ -36,9 +36,15 @@ func (a *API) GetSensors() (*Sensors, error) {
 
 }
 
-// GetEventReader returns a event.Reader with a default cached type store
-func (a *API) GetEventReader() *event.Reader {
+// EventReader returns a event.Reader with a default cached type store
+func (a *API) EventReader() (*event.Reader, error) {
 
-	return &event.Reader{TypeStore: &CachedTypeStore{SensorGetter: a}, WebsocketAddr: a.Config.wsAddr}
+	if a.Config.wsAddr == "" {
+		err := a.Config.discoverWebsocket()
+		if err != nil {
+			return nil, err
+		}
+	}
 
+	return &event.Reader{TypeStore: &CachedTypeStore{SensorGetter: a}, WebsocketAddr: a.Config.wsAddr}, nil
 }

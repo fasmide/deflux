@@ -30,17 +30,26 @@ func main() {
 		return
 	}
 
-	d := deconz.EventReader{Config: config.Deconz}
-	err = d.Dial()
+	// get an event reader from the API
+	d := deconz.API{Config: config.Deconz}
+	reader, err := d.EventReader()
 	if err != nil {
 		panic(err)
 	}
+
+	// Dial the reader
+	err = reader.Dial()
+	if err != nil {
+		panic(err)
+	}
+
+	// read it
 	for {
-		e, err := d.ReadEvent()
+		e, err := reader.ReadEvent()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("I have a message: %+v", e)
+		log.Printf("I have a message: %s", e)
 	}
 }
 

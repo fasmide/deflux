@@ -20,9 +20,6 @@ const floodDetectorFloodDetectedEventPayload = `{ "e": "changed", "id": "6", "r"
 // xiaomi random switch "sensor"
 const switchSensorEventPayload = `{	"e": "changed",	"id": "7",	"r": "sensors",	"state": {	  "buttonevent": 1000,	  "lastupdated": "2018-03-20T20:52:18"	},	"t": "event"  }  `
 
-// some unknown json
-const unknownEventPayload = `{"e": "hello my friend", "y": "Pænt go dag Hr 🦆"}`
-
 type LookupImpl struct {
 	Store map[int]string
 }
@@ -62,13 +59,6 @@ func TestSmokeDetectorNoFireEvent(t *testing.T) {
 	}
 
 	if smokeDetectorEvent.Fire != false {
-		t.Fail()
-	}
-}
-
-func TestUnknownEvent(t *testing.T) {
-	_, err := decoder.Parse([]byte(unknownEventPayload))
-	if err == nil {
 		t.Fail()
 	}
 }

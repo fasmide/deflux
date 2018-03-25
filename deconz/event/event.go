@@ -33,6 +33,14 @@ func (d *Decoder) Parse(b []byte) (*Event, error) {
 		return nil, fmt.Errorf("unable to unmarshal json: %s", err)
 	}
 
+	// If there is no state, dont try to parse it
+	// TODO: figure out what to do with these
+	//       some of them seems to be battery updates
+	if len(e.RawState) == 0 {
+		e.State = EmptyState{}
+		return &e, nil
+	}
+
 	err = e.ParseState(d.TypeStore)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshal state: %s", err)
@@ -81,6 +89,10 @@ func (e *Event) ParseState(tl TypeLookuper) error {
 		err = json.Unmarshal(e.RawState, &s)
 		e.State = s
 		break
+	case "Daylight":
+		var s Daylight
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = s
 	default:
 		err = fmt.Errorf("unable to unmarshal event state: %s is not a known type", t)
 	}
@@ -133,3 +145,13 @@ type ZHASwitch struct {
 	State
 	Buttonevent int
 }
+
+// Daylight represents a change in daylight
+type Daylight struct {
+	State
+	Daylight bool
+	Status   int `json:"status,string"`
+}
+
+// EmptyState is an empty struct used to indicate no state was parsed
+type EmptyState struct{}
