@@ -54,21 +54,12 @@ func (a *API) EventReader() (*event.Reader, error) {
 	return &event.Reader{TypeStore: a.sensorCache, WebsocketAddr: a.Config.wsAddr}, nil
 }
 
-// SensorEventReader takes an event reader and looks up the corresponding sensor
-func (a *API) SensorEventReader(r *event.Reader) (*SensorEvent, error) {
+// SensorEventReader takes an event reader and returns an sensor event reader
+func (a *API) SensorEventReader(r *event.Reader) *SensorEventReader {
 
 	if a.sensorCache == nil {
 		a.sensorCache = &CachedSensorStore{SensorGetter: a}
 	}
 
-	e, err := r.ReadEvent()
-	if err != nil {
-		return nil, err
-	}
-
-	se, err := WithSensor(e, a.sensorCache)
-	if err != nil {
-		return nil, err
-	}
-	return se, nil
+	return &SensorEventReader{lookup: a.sensorCache, reader: r}
 }

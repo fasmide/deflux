@@ -36,6 +36,7 @@ func (c *CachedSensorStore) LookupType(i int) (string, error) {
 	return "", errors.New("no such sensor")
 }
 
+// LookupSensor returns a sensor for an sensor id
 func (c *CachedSensorStore) LookupSensor(i int) (*Sensor, error) {
 	var err error
 	if c.cache == nil {

@@ -43,13 +43,15 @@ func main() {
 		panic(err)
 	}
 
-	// read it
+	// create a new reader, embedding the event reader
+	sensorEventReader := d.SensorEventReader(reader)
+
 	for {
-		e, err := d.SensorEventReader(reader).ReadEvent()
+		e, err := sensorEventReader.Read()
 		if err != nil {
 			panic(err)
 		}
-		log.Printf("I have a message: %s", e)
+		log.Printf("I have a message: %+v", e)
 	}
 }
 

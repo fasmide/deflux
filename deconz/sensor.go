@@ -7,4 +7,5 @@ type Sensors map[int]Sensor
 // for event parsing to work
 type Sensor struct {
 	Type string
+	Name string
 }

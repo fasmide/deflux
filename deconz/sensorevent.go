@@ -17,9 +17,20 @@ type SensorLookup interface {
 	LookupSensor(int) (*Sensor, error)
 }
 
+// SensorEventReader reads events from an event.reader and returns SensorEvents
+type SensorEventReader struct {
+	lookup SensorLookup
+	reader *event.Reader
+}
+
 // WithSensor returns an sensor event with event and sensor embedded
-func WithSensor(e *event.Event, s SensorLookup) (*SensorEvent, error) {
-	sensor, err := s.LookupSensor(e.ID)
+func (s *SensorEventReader) Read() (*SensorEvent, error) {
+	e, err := s.reader.ReadEvent()
+	if err != nil {
+		return nil, fmt.Errorf("unable to read event: %s", err)
+	}
+
+	sensor, err := s.lookup.LookupSensor(e.ID)
 	if err != nil {
 		return nil, fmt.Errorf("could not lookup sensor for id %d: %s", e.ID, err)
 	}

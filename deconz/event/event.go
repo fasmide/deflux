@@ -150,7 +150,7 @@ type ZHASwitch struct {
 type Daylight struct {
 	State
 	Daylight bool
-	Status   int `json:"status,string"`
+	Status   int
 }
 
 // EmptyState is an empty struct used to indicate no state was parsed
