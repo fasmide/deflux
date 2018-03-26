@@ -45,7 +45,7 @@ func main() {
 
 	// read it
 	for {
-		e, err := reader.ReadEvent()
+		e, err := d.SensorEventReader(reader).ReadEvent()
 		if err != nil {
 			panic(err)
 		}
