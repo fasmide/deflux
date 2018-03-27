@@ -63,7 +63,7 @@ func main() {
 				continue
 			}
 
-			pt, err := client.NewPoint("sensors", tags, fields, time.Now())
+			pt, err := client.NewPoint("deflux", tags, fields, time.Now())
 			if err != nil {
 				panic(err)
 			}
@@ -77,6 +77,7 @@ func main() {
 				panic(err)
 			}
 
+			log.Printf("Saved %d records to influxdb", len(batch.Points()))
 			// influx batch point
 			batch, err = client.NewBatchPoints(client.BatchPointsConfig{
 				Database:  config.InfluxdbDatabase,
