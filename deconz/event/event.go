@@ -112,16 +112,37 @@ type ZHAHumidity struct {
 	Humidity int
 }
 
+// Fields returns timeseries data for influxdb
+func (z *ZHAHumidity) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"humidity": z.Humidity * 100,
+	}
+}
+
 // ZHAPressure represents a presure change
 type ZHAPressure struct {
 	State
 	Pressure int
 }
 
+// Fields returns timeseries data for influxdb
+func (z *ZHAPressure) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"pressure": z.Pressure,
+	}
+}
+
 // ZHATemperature represents a temperature change
 type ZHATemperature struct {
 	State
 	Temperature int
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHATemperature) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"temperature": z.Temperature * 100,
+	}
 }
 
 // ZHAWater respresents a change from a flood sensor
@@ -132,6 +153,15 @@ type ZHAWater struct {
 	Water      bool
 }
 
+// Fields returns timeseries data for influxdb
+func (z *ZHAWater) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"lowbattery": z.Lowbattery,
+		"tampered":   z.Tampered,
+		"water":      z.Water,
+	}
+}
+
 // ZHAFire represents a change from a smoke detector
 type ZHAFire struct {
 	State
@@ -140,10 +170,26 @@ type ZHAFire struct {
 	Tampered   bool
 }
 
+// Fields returns timeseries data for influxdb
+func (z *ZHAFire) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"lowbattery": z.Lowbattery,
+		"tampered":   z.Tampered,
+		"fire":       z.Fire,
+	}
+}
+
 // ZHASwitch represents a change from a button or switch
 type ZHASwitch struct {
 	State
 	Buttonevent int
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHASwitch) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"buttonevent": z.Buttonevent,
+	}
 }
 
 // Daylight represents a change in daylight
@@ -151,6 +197,14 @@ type Daylight struct {
 	State
 	Daylight bool
 	Status   int
+}
+
+// Fields returns timeseries data for influxdb
+func (z *Daylight) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"daylight": z.Daylight,
+		"status":   z.Status,
+	}
 }
 
 // EmptyState is an empty struct used to indicate no state was parsed
