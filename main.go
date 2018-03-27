@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"time"
 
 	"github.com/fasmide/deflux/deconz"
 	client "github.com/influxdata/influxdb/client/v2"
@@ -18,8 +19,9 @@ const YmlFileName = "deflux.yml"
 
 // Configuration holds data for Deconz and influxdb configuration
 type Configuration struct {
-	Deconz   deconz.Config
-	Influxdb client.HTTPConfig
+	Deconz           deconz.Config
+	Influxdb         client.HTTPConfig
+	InfluxdbDatabase string
 }
 
 func main() {
@@ -30,29 +32,91 @@ func main() {
 		return
 	}
 
-	// get an event reader from the API
-	d := deconz.API{Config: config.Deconz}
-	reader, err := d.EventReader()
+	sensorChan, err := sensorEventChan(config.Deconz)
 	if err != nil {
 		panic(err)
+	}
+
+	// initial influx batch
+	batch, err := client.NewBatchPoints(client.BatchPointsConfig{
+		Database:  config.InfluxdbDatabase,
+		Precision: "s",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	var timeout time.Timer
+
+	influxdb, err := client.NewHTTPClient(config.Influxdb)
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+
+		select {
+		case sensorEvent := <-sensorChan:
+			tags, fields, err := sensorEvent.Timeseries()
+			if err != nil {
+				log.Printf("not adding event to influx batch: %s", err)
+				continue
+			}
+
+			pt, err := client.NewPoint("sensors", tags, fields, time.Now())
+			if err != nil {
+				panic(err)
+			}
+			batch.AddPoint(pt)
+			timeout.Reset(1 * time.Second)
+
+		case <-timeout.C:
+			// when timer fires: save batch points, initialize a new batch
+			err := influxdb.Write(batch)
+			if err != nil {
+				panic(err)
+			}
+
+			// influx batch point
+			batch, err = client.NewBatchPoints(client.BatchPointsConfig{
+				Database:  config.InfluxdbDatabase,
+				Precision: "s",
+			})
+		}
+	}
+}
+
+func sensorEventChan(c deconz.Config) (chan *deconz.SensorEvent, error) {
+	// get an event reader from the API
+	d := deconz.API{Config: c}
+	reader, err := d.EventReader()
+	if err != nil {
+		return nil, err
 	}
 
 	// Dial the reader
 	err = reader.Dial()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// create a new reader, embedding the event reader
 	sensorEventReader := d.SensorEventReader(reader)
+	channel := make(chan *deconz.SensorEvent)
 
-	for {
-		e, err := sensorEventReader.Read()
-		if err != nil {
-			panic(err)
+	go func() {
+		for {
+			e, err := sensorEventReader.Read()
+			if err != nil {
+				log.Printf("Error received from sensoreventreader: %s", err)
+				close(channel)
+				return
+			}
+			channel <- e
 		}
-		log.Printf("I have a message: %+v", e)
-	}
+	}()
+
+	return channel, nil
 }
 
 func loadConfiguration() (*Configuration, error) {
@@ -132,6 +196,7 @@ func defaultConfiguration() *Configuration {
 			Password:  "change me",
 			UserAgent: "Deflux",
 		},
+		InfluxdbDatabase: "deconz",
 	}
 
 	// lets see if we are able to discover a gateway, and overwrite parts of the
