@@ -46,7 +46,8 @@ func main() {
 		panic(err)
 	}
 
-	var timeout time.Timer
+	timeout := time.NewTimer(1 * time.Second)
+	timeout.Stop()
 
 	influxdb, err := client.NewHTTPClient(config.Influxdb)
 	if err != nil {

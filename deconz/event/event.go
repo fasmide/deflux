@@ -37,7 +37,7 @@ func (d *Decoder) Parse(b []byte) (*Event, error) {
 	// TODO: figure out what to do with these
 	//       some of them seems to be battery updates
 	if len(e.RawState) == 0 {
-		e.State = EmptyState{}
+		e.State = &EmptyState{}
 		return &e, nil
 	}
 
@@ -62,37 +62,37 @@ func (e *Event) ParseState(tl TypeLookuper) error {
 	case "ZHAFire":
 		var s ZHAFire
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 		break
 	case "ZHATemperature":
 		var s ZHATemperature
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 		break
 	case "ZHAPressure":
 		var s ZHAPressure
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 		break
 	case "ZHAHumidity":
 		var s ZHAHumidity
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 		break
 	case "ZHAWater":
 		var s ZHAWater
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 		break
 	case "ZHASwitch":
 		var s ZHASwitch
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 		break
 	case "Daylight":
 		var s Daylight
 		err = json.Unmarshal(e.RawState, &s)
-		e.State = s
+		e.State = &s
 	default:
 		err = fmt.Errorf("unable to unmarshal event state: %s is not a known type", t)
 	}
@@ -115,7 +115,7 @@ type ZHAHumidity struct {
 // Fields returns timeseries data for influxdb
 func (z *ZHAHumidity) Fields() map[string]interface{} {
 	return map[string]interface{}{
-		"humidity": z.Humidity * 100,
+		"humidity": float64(z.Humidity) / 100,
 	}
 }
 
@@ -141,7 +141,7 @@ type ZHATemperature struct {
 // Fields returns timeseries data for influxdb
 func (z *ZHATemperature) Fields() map[string]interface{} {
 	return map[string]interface{}{
-		"temperature": z.Temperature * 100,
+		"temperature": float64(z.Temperature) / 100,
 	}
 }
 

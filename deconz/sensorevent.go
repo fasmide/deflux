@@ -1,7 +1,6 @@
 package deconz
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/fasmide/deflux/deconz/event"
@@ -19,12 +18,12 @@ type fielder interface {
 
 // Timeseries returns tags and fields for use in influxdb
 func (s *SensorEvent) Timeseries() (map[string]string, map[string]interface{}, error) {
-	fielder, ok := s.State.(fielder)
+	f, ok := s.Event.State.(fielder)
 	if !ok {
-		return nil, nil, errors.New("this event has no time series data")
+		return nil, nil, fmt.Errorf("this event (%T:%s) has no time series data", s.State, s.Name)
 	}
 
-	return map[string]string{"name": s.Name, "type": s.Sensor.Type}, fielder.Fields(), nil
+	return map[string]string{"name": s.Name, "type": s.Sensor.Type}, f.Fields(), nil
 }
 
 // SensorLookup represents an interface for sensor lookup
