@@ -55,7 +55,7 @@ $ deflux
 2018/03/29 14:03:47 Saved 3 records to influxdb
 ```
 
-It does have some rough edges that i'll hopefully be working on - now you should be able to find these sensor measurements in influxdb:
+It does have some rough edges that i'll hopefully be working on - now you should be able to find these sensor measurements in influxdb
 
 ## Influxdb
 
