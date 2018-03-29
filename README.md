@@ -1,5 +1,7 @@
 # deflux
-deflux connects to deCONZ rest api and listens for sensor updates and write these to InfluxDB
+deflux connects to deCONZ rest api and listens for sensor updates and write these to InfluxDB.
+
+deCONZ supports a variaty of Zigbee sensors but have no historical data about their values - with deflux you'll be able to store all these measurements in influxdb where they can be queried from the command line or graphical tools such as grafana. 
 
 ## Usage
 
@@ -13,7 +15,7 @@ deflux tries to read `$(pwd)/deflux.yml` or `/etc/deflux.yml` in that order, if 
 
 Hint: if you've temporarily unlocked the deconz gateway, it should be able to fill in the api key by it self, this needs some testing though...
 
-First run
+First run generates a sample configuration:
 
 ```
 $ deflux
@@ -87,3 +89,6 @@ time                buttonevent daylight humidity name               pressure st
 ## Grafana
 
 TODO: As soon as i have a few weeks of sensor data i'll put some graph examples and a getting started dashboard
+
+## Notes
+I'm in possession of Temperature, Humidity, Pressure, Water flood, Fire alarm and a few buttons - all Xiaomi branded and as such dont know if all other sensors will just work, there is properly a lot deconz event i don't account for, these should be easily added though.
