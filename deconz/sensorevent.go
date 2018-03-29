@@ -23,7 +23,7 @@ func (s *SensorEvent) Timeseries() (map[string]string, map[string]interface{}, e
 		return nil, nil, fmt.Errorf("this event (%T:%s) has no time series data", s.State, s.Name)
 	}
 
-	return map[string]string{"name": s.Name, "type": s.Sensor.Type}, f.Fields(), nil
+	return map[string]string{"name": s.Name, "type": s.Sensor.Type, "id": string(s.Event.ID)}, f.Fields(), nil
 }
 
 // SensorLookup represents an interface for sensor lookup
