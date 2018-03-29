@@ -91,4 +91,4 @@ time                buttonevent daylight humidity name               pressure st
 TODO: As soon as i have a few weeks of sensor data i'll put some graph examples and a getting started dashboard
 
 ## Notes
-I'm in possession of Temperature, Humidity, Pressure, Water flood, Fire alarm and a few buttons - all Xiaomi branded and as such dont know if all other sensors will just work, there is properly a lot deconz event i don't account for, these should be easily added though.
+I'm in possession of Temperature, Humidity, Pressure, Water flood, Fire alarm and a few buttons - all Xiaomi branded and as such dont know if all other sensors will just work, there is properly a lot of deconz events i don't account for, these should be easily added though.
