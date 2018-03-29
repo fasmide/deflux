@@ -237,7 +237,7 @@ func defaultConfiguration() *Configuration {
 		return &c
 	}
 
-	// TODO: discover is acturlly a slice of multiple discovered gateways,
+	// TODO: discover is actually a slice of multiple discovered gateways,
 	// but for now we use only the first available
 	deconz := discovered[0]
 	addr := url.URL{

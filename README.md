@@ -57,6 +57,10 @@ $ deflux
 
 It does have some rough edges that i'll hopefully be working on - now you should be able to find these sensor measurements in influxdb:
 
+## Influxdb
+
+Sensor values are added as influxdb values and tagged with sensor type, id and name
+
 ```
 > select * from deflux order by time desc limit 25;
 name: deflux
@@ -80,4 +84,6 @@ time                buttonevent daylight humidity name               pressure st
 1522315299000000000                               Kælder gang                        20.76       ZHATemperature
 ``` 
 
-Sensor values are added as influxdb values and tagged with sensor type, id and name
+## Grafana
+
+TODO: As soon as i have a few weeks of sensor data i'll put some graph examples and a getting started dashboard
