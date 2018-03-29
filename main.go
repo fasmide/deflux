@@ -37,6 +37,8 @@ func main() {
 		panic(err)
 	}
 
+	log.Printf("Connected to deCONZ at %s", config.Deconz.Addr)
+
 	// initial influx batch
 	batch, err := client.NewBatchPoints(client.BatchPointsConfig{
 		Database:  config.InfluxdbDatabase,
@@ -162,22 +164,48 @@ func readConfiguration() ([]byte, error) {
 	return data, nil
 }
 
+// influxdbConfigProxy proxies client.HTTPConfig into a yml capable
+// struct, its only used for encoding to yml as the yml package
+// have no problem skipping the Proxy field when decoding
+type influxdbConfigProxy struct {
+	Addr      string
+	Username  string
+	Password  string
+	UserAgent string
+}
+
 func outputDefaultConfiguration() {
 
 	c := defaultConfiguration()
-	yml, err := yaml.Marshal(c)
-	if err != nil {
-		log.Fatalf("unable to generate default configuration: %s", err)
-	}
 
+	// try to pair with deconz
 	u, err := url.Parse(c.Deconz.Addr)
 	if err == nil {
-		// try to pair with deCONZ
 		apikey, err := deconz.Pair(*u)
 		if err != nil {
 			log.Printf("unable to pair with deconz: %s, please fill out APIKey manually", err)
 		}
 		c.Deconz.APIKey = string(apikey)
+	}
+
+	// we need to use a proxy struct to encode yml as the influxdb client configuration struct
+	// includes a Proxy: func() field that the yml encoder cannot handle
+	yml, err := yaml.Marshal(struct {
+		Deconz           deconz.Config
+		Influxdb         influxdbConfigProxy
+		InfluxdbDatabase string
+	}{
+		Deconz: c.Deconz,
+		Influxdb: influxdbConfigProxy{
+			Addr:      c.Influxdb.Addr,
+			Username:  c.Influxdb.Username,
+			Password:  c.Influxdb.Password,
+			UserAgent: c.Influxdb.UserAgent,
+		},
+		InfluxdbDatabase: c.InfluxdbDatabase,
+	})
+	if err != nil {
+		log.Fatalf("unable to generate default configuration: %s", err)
 	}
 
 	log.Printf("Outputting default configuration, save this to /etc/deflux.yml")
