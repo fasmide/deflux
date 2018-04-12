@@ -61,29 +61,32 @@ It does have some rough edges that i'll hopefully be working on - now you should
 
 ## Influxdb
 
-Sensor values are added as influxdb values and tagged with sensor type, id and name
+Sensor values are added as influxdb values and tagged with sensor type, id and name.
+Different event types are stored in different measurements, meaning you will end up with multiple influxdb measurements:
+```
+> show measurements;
+name: measurements
+name
+----
+deflux_Daylight
+deflux_ZHAHumidity
+deflux_ZHAPressure
+deflux_ZHATemperature
 
 ```
-> select * from deflux order by time desc limit 25;
-name: deflux
-time                buttonevent daylight humidity name               pressure status temperature type
-----                ----------- -------- -------- ----               -------- ------ ----------- ----
-1522325026000000000                               Terrasse                           22.32       ZHATemperature
-1522325026000000000                      26.15    Terrasse                                       ZHAHumidity
-1522325026000000000                               Terrasse           1004                        ZHAPressure
-1522324839000000000                               Kælder lab                         22.38       ZHATemperature
-1522324839000000000                      25.98    Kælder lab                                     ZHAHumidity
-1522324632000000000 1005                          lumi.sensor_switch                             ZHASwitch
-1522324626000000000 1004                          lumi.sensor_switch                             ZHASwitch
-1522320725000000000                               Kælder lab                         21.88       ZHATemperature
-1522320725000000000                      26.36    Kælder lab                                     ZHAHumidity
-1522320092000000000                      26.28    Terrasse                                       ZHAHumidity
-1522320092000000000                               Terrasse                           22.1        ZHATemperature
-1522320092000000000                               Terrasse           1004                        ZHAPressure
-1522315309000000000                      31.43    Kælder gang                                    ZHAHumidity
-1522315309000000000                               Kælder gang                        20.79       ZHATemperature
-1522315299000000000                      39.91    Kælder gang                                    ZHAHumidity
-1522315299000000000                               Kælder gang                        20.76       ZHATemperature
+Example from deflux_ZHAHumidity
+```
+> select * from deflux_ZHAHumidity;
+name: deflux_ZHAHumidity
+time                humidity id name       type
+----                -------- -- ----       ----
+1523555448000000000 38.92    13 Kælder bad ZHAHumidity
+1523556151000000000 40.88    13 Kælder bad ZHAHumidity
+1523556658000000000 39.44    13 Kælder bad ZHAHumidity
+1523557231000000000 55.48    2  Terrasse   ZHAHumidity
+1523557476000000000 38.86    13 Kælder bad ZHAHumidity
+1523557846000000000 56       2  Terrasse   ZHAHumidity
+1523558273000000000 37.74    13 Kælder bad ZHAHumidity
 ``` 
 
 ## Grafana
