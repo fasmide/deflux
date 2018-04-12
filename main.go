@@ -44,10 +44,12 @@ func main() {
 		Database:  config.InfluxdbDatabase,
 		Precision: "s",
 	})
+
 	if err != nil {
 		panic(err)
 	}
 
+	//TODO: figure out how to create a timer that is stopped
 	timeout := time.NewTimer(1 * time.Second)
 	timeout.Stop()
 
@@ -66,10 +68,17 @@ func main() {
 				continue
 			}
 
-			pt, err := client.NewPoint("deflux", tags, fields, time.Now())
+			pt, err := client.NewPoint(
+				fmt.Sprintf("deflux_%s", sensorEvent.Event.Type),
+				tags,
+				fields,
+				time.Now(), // TODO: we should use the time associated with the event...
+			)
+
 			if err != nil {
 				panic(err)
 			}
+
 			batch.AddPoint(pt)
 			timeout.Reset(1 * time.Second)
 
