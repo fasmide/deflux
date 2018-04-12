@@ -69,7 +69,7 @@ func main() {
 			}
 
 			pt, err := client.NewPoint(
-				fmt.Sprintf("deflux_%s", sensorEvent.Event.Type),
+				fmt.Sprintf("deflux_%s", sensorEvent.Sensor.Type),
 				tags,
 				fields,
 				time.Now(), // TODO: we should use the time associated with the event...
