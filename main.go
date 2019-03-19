@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/fasmide/deflux/deconz"
-	client "github.com/influxdata/influxdb1-client"
+	client "github.com/influxdata/influxdb1-client/v2"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -122,10 +122,12 @@ func sensorEventChan(c deconz.Config) (chan *deconz.SensorEvent, error) {
 			e, err := sensorEventReader.Read()
 			if err != nil {
 				log.Printf("Error received from sensoreventreader: %s", err)
-				close(channel)
-				return
+				//close(channel)
+				//return
 			}
-			channel <- e
+			if err == nil {
+				channel <- e
+			}
 		}
 	}()
 
