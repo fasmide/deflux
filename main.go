@@ -116,21 +116,9 @@ func sensorEventChan(c deconz.Config) (chan *deconz.SensorEvent, error) {
 	// create a new reader, embedding the event reader
 	sensorEventReader := d.SensorEventReader(reader)
 	channel := make(chan *deconz.SensorEvent)
-
-	go func() {
-		for {
-			e, err := sensorEventReader.Read()
-			if err != nil {
-				log.Printf("Error received from sensoreventreader: %s", err)
-				//close(channel)
-				//return
-			}
-			if err == nil {
-				channel <- e
-			}
-		}
-	}()
-
+	// start it, it starts its own thread
+	sensorEventReader.Start(channel)
+	// return the channel
 	return channel, nil
 }
 

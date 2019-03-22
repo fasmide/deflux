@@ -16,6 +16,25 @@ type Reader struct {
 	conn          *websocket.Conn
 }
 
+
+type EventError interface {
+	error
+	Recoverable() bool
+}
+
+type EventErrorImpl struct {
+	errStr string
+	recoverable bool
+}
+
+function (e EventErrorImpl) Recoverable() bool {
+	return e.recoverable
+}
+
+function (e EventErrorImpl) Error() string {
+	return e.errStr
+}
+
 // Dial connects connects to deconz, use ReadEvent to recieve events
 func (r *Reader) Dial() error {
 
@@ -47,7 +66,7 @@ func (r *Reader) ReadEvent() (*Event, error) {
 
 	e, err := r.decoder.Parse(message)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse message: %s", err)
+		return nil, EventError{fmt.Errorf("unable to parse message: %s", err), true}
 	}
 
 	return e, nil
