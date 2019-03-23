@@ -27,11 +27,11 @@ type EventErrorImpl struct {
 	recoverable bool
 }
 
-function (e EventErrorImpl) Recoverable() bool {
+func (e EventErrorImpl) Recoverable() bool {
 	return e.recoverable
 }
 
-function (e EventErrorImpl) Error() string {
+func (e EventErrorImpl) Error() string {
 	return e.errStr
 }
 
@@ -66,7 +66,7 @@ func (r *Reader) ReadEvent() (*Event, error) {
 
 	e, err := r.decoder.Parse(message)
 	if err != nil {
-		return nil, EventError{fmt.Errorf("unable to parse message: %s", err), true}
+		return nil, EventErrorImpl{fmt.Errorf("unable to parse message: %s", err).Error(), true}
 	}
 
 	return e, nil

@@ -1,10 +1,11 @@
 package deconz
 
 import (
-	"fmt"
+	"errors"
 	"time"
+	"log"
 
-	"github.com/fasmide/deflux/deconz/event"
+	"github.com/runger1101001/deflux/deconz/event"
 )
 
 // SensorLookup represents an interface for sensor lookup
@@ -15,6 +16,8 @@ type SensorLookup interface {
 // EventReader interface
 type EventReader interface {
 	ReadEvent() (*event.Event, error)
+	Dial() error
+	Close() error
 }
 
 // SensorEventReader reads events from an event.reader and returns SensorEvents
@@ -41,7 +44,7 @@ func (r *SensorEventReader) Start(out chan *SensorEvent) error {
 	}
 
 	if r.running {
-		return "Reader is already running."
+		return errors.New("Reader is already running.")
 	}
 
 	r.running = true
@@ -57,20 +60,26 @@ func (r *SensorEventReader) Start(out chan *SensorEvent) error {
 					time.Sleep(5 * time.Second) // TODO configurable delay
 				} else {
 					log.Printf("Deconz websocket connected")
+					break
 				}
 			}
 			// read events until connection fails
 			for r.running {
 				e, err := r.reader.ReadEvent()
 				if err != nil {
-					if eerr, ok := err.(EventError) ; ok && eerr.Recoverable() {
+					if eerr, ok := err.(event.EventError) ; ok && eerr.Recoverable() {
 						log.Printf("Dropping event due to error: %s", err)
 						continue
 					}
 					continue REDIAL
 				}
+				// we only care about sensor events
+				if e.Resource != "sensors" {
+					log.Printf("Dropping non-sensor event type %s", e.Resource)
+					continue;
+				}
 
-				sensor, err := s.lookup.LookupSensor(e.ID)
+				sensor, err := r.lookup.LookupSensor(e.ID)
 				if err != nil {
 					log.Printf("Dropping event. Could not lookup sensor for id %d: %s", e.ID, err)
 					continue

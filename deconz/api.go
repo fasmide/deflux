@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/fasmide/deflux/deconz/event"
+	"github.com/runger1101001/deflux/deconz/event"
 )
 
 // API represents the deCONZ rest api
