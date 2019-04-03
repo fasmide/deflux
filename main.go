@@ -9,7 +9,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/runger1101001/deflux/deconz"
+	"github.com/fasmide/deflux/deconz"
 	client "github.com/influxdata/influxdb1-client/v2"
 	yaml "gopkg.in/yaml.v2"
 )

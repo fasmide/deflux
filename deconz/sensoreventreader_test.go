@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/runger1101001/deflux/deconz/event"
+	"github.com/fasmide/deflux/deconz/event"
 )
 
 const smokeDetectorNoFireEventPayload = `{	"e": "changed",	"id": "5",	"r": "sensors",	"state": {	  "fire": false,	  "lastupdated": "2018-03-13T19:46:03",	  "lowbattery": false,	  "tampered": false	},	"t": "event"  }`
@@ -23,18 +23,25 @@ func (t *testLookup) LookupType(i int) (string, error) {
 type testReader struct {
 }
 
-func (t *testReader) ReadEvent() (*event.Event, error) {
+func (t testReader) ReadEvent() (*event.Event, error) {
 	d := event.Decoder{TypeStore: &testLookup{}}
 	return d.Parse([]byte(smokeDetectorNoFireEventPayload))
 }
+func (t testReader) Dial() error {
+	return nil;
+}
+func (t testReader) Close() error {
+	return nil;
+}
 func TestSensorEventReader(t *testing.T) {
 
-	r := SensorEventReader{lookup: &testLookup{}, reader: &testReader{}}
-
-	e, err := r.Read()
+	r := SensorEventReader{reader: testReader{}}
+	channel := make(chan *SensorEvent)
+	err := r.Start(channel)
 	if err != nil {
 		t.Fail()
 	}
+	e := <-channel
 	if strconv.Itoa(e.Event.ID) != "5" {
 		t.Fail()
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/runger1101001/deflux/deconz/event"
+	"github.com/fasmide/deflux/deconz/event"
 )
 
 // SensorEvent is a sensor and a event embedded
