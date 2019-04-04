@@ -36,7 +36,7 @@ func (d *Decoder) Parse(b []byte) (*Event, error) {
 	// If there is no state, dont try to parse it
 	// TODO: figure out what to do with these
 	//       some of them seems to be battery updates
-	if len(e.RawState) == 0 {
+	if e.Resource != "sensors" || len(e.RawState) == 0 {
 		e.State = &EmptyState{}
 		return &e, nil
 	}
