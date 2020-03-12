@@ -94,8 +94,18 @@ func (e *Event) ParseState(tl TypeLookuper) error {
 		err = json.Unmarshal(e.RawState, &s)
 		e.State = &s
 		break	
+	case "ClipPresence":
+		var s ClipPresence
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break	
 	case "ZHALightLevel":
 		var s ZHALightLevel
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
+	case "ZHAOpenClose":
+		var s ZHAOpenClose
 		err = json.Unmarshal(e.RawState, &s)
 		e.State = &s
 		break
@@ -156,6 +166,19 @@ func (z *ZHATemperature) Fields() map[string]interface{} {
 }
 
 // ZHAPresence respresents a change from a presence sensor
+type ClipPresence struct {
+	State
+	presence bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ClipPresence) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"presence": z.presence
+	}
+}
+
+// ZHAPresence respresents a change from a presence sensor
 type ZHAPresence struct {
 	State
 	presence bool
@@ -165,6 +188,19 @@ type ZHAPresence struct {
 func (z *ZHAPresence) Fields() map[string]interface{} {
 	return map[string]interface{}{
 		"presence": z.presence
+	}
+}
+
+// ZHAOpenClose respresents a change from a presence sensor
+type ZHAOpenClose struct {
+	State
+	open bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHAOpenClose) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"open": z.presence
 	}
 }
 
