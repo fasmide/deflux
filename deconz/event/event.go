@@ -93,6 +93,37 @@ func (e *Event) ParseState(tl TypeLookuper) error {
 		var s Daylight
 		err = json.Unmarshal(e.RawState, &s)
 		e.State = &s
+		break
+	case "ZHAPresence":
+		var s ZHAPresence
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
+	case "CLIPPresence":
+		var s CLIPPresence
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
+	case "ZHALightLevel":
+		var s ZHALightLevel
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
+	case "ZHAVibration":
+		var s ZHAVibration
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
+	case "ZHAOpenClose":
+		var s ZHAOpenClose
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
+	case "ZHACarbonMonoxide":
+		var s ZHACarbonMonoxide
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
 	default:
 		err = fmt.Errorf("unable to unmarshal event state: %s is not a known type", t)
 	}
@@ -205,6 +236,94 @@ func (z *Daylight) Fields() map[string]interface{} {
 		"daylight": z.Daylight,
 		"status":   z.Status,
 	}
+}
+
+// ZHAPresence represents a presence Sensor
+type ZHAPresence struct {
+	State
+	Presence bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHAPresence) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"presence": z.Presence,
+	}
+}
+
+// CLIPPresence represents a presence Sensor
+type CLIPPresence struct {
+	State
+	Presence bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *CLIPPresence) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"presence": z.Presence,
+	}
+}
+
+// ZHALightLevel represents a LightLevel Sensor
+type ZHALightLevel struct {
+	State
+	Dark bool
+	Daylight bool
+	LightLevel int32
+	Lux int16
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHALightLevel) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"daylight": z.Daylight,
+		"dark": z.Dark,
+		"lightlevel": z.LightLevel,
+		"lux": z.Lux,
+	}
+}
+
+// ZHAVibration represents a Vibration Sensor
+type ZHAVibration struct {
+	State
+	Vibration bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHAVibration) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"vibration": z.Vibration,
+	}
+}
+
+// ZHAVibration represents a Vibration Sensor
+type ZHAOpenClose struct {
+	State
+	Open bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHAOpenClose) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"open": z.Open,
+	}
+}
+
+// ZHACarbonMonoxide represents a CarbonMonoxide Sensor
+type ZHACarbonMonoxide struct {
+	State
+	Carbonmonoxide bool
+	Lowbattery bool
+	Tampered bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHACarbonMonoxide) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"CO": z.Carbonmonoxide,
+		"lowbattery": z.Lowbattery,
+		"tampered": z.Tampered,
+		}
 }
 
 // EmptyState is an empty struct used to indicate no state was parsed
