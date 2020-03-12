@@ -89,6 +89,11 @@ func (e *Event) ParseState(tl TypeLookuper) error {
 		err = json.Unmarshal(e.RawState, &s)
 		e.State = &s
 		break
+	case "ZHAPresence":
+		var s ZHAPresence
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break	
 	case "Daylight":
 		var s Daylight
 		err = json.Unmarshal(e.RawState, &s)
@@ -145,20 +150,16 @@ func (z *ZHATemperature) Fields() map[string]interface{} {
 	}
 }
 
-// ZHAWater respresents a change from a flood sensor
-type ZHAWater struct {
+// ZHAPresence respresents a change from a presence sensor
+type ZHAPresence struct {
 	State
-	Lowbattery bool
-	Tampered   bool
-	Water      bool
+	presence bool
 }
 
 // Fields returns timeseries data for influxdb
-func (z *ZHAWater) Fields() map[string]interface{} {
+func (z *ZHAPresence) Fields() map[string]interface{} {
 	return map[string]interface{}{
-		"lowbattery": z.Lowbattery,
-		"tampered":   z.Tampered,
-		"water":      z.Water,
+		"presence": z.presence
 	}
 }
 
@@ -192,8 +193,25 @@ func (z *ZHASwitch) Fields() map[string]interface{} {
 	}
 }
 
+// ZHAWater respresents a change from a flood sensor
+type ZHAWater struct {
+	State
+	Lowbattery bool
+	Tampered   bool
+	Water      bool
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHAWater) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"lowbattery": z.Lowbattery,
+		"tampered":   z.Tampered,
+		"water":      z.Water,
+	}
+}
+
 // Daylight represents a change in daylight
-type Daylight struct {
+type ZHAPresence struct {
 	State
 	Daylight bool
 	Status   int
