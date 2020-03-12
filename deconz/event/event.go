@@ -191,7 +191,7 @@ func (z *ZHAPresence) Fields() map[string]interface{} {
 	}
 }
 
-// ZHAOpenClose respresents a change from a presence sensor
+// ZHAOpenClose respresents a change from a Door/Window open/close sensor
 type ZHAOpenClose struct {
 	State
 	open bool
@@ -204,7 +204,7 @@ func (z *ZHAOpenClose) Fields() map[string]interface{} {
 	}
 }
 
-// ZHALightLevel respresents a change from a presence sensor
+// ZHALightLevel respresents a change from a Lightlevel sensor
 type ZHALightLevel struct {
 	State
 	dark bool,
@@ -270,7 +270,7 @@ func (z *ZHAWater) Fields() map[string]interface{} {
 	}
 }
 
-// Daylight represents a change in daylight
+// ZHAPresence represents a presence seonsor
 type ZHAPresence struct {
 	State
 	Daylight bool
