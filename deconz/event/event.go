@@ -94,6 +94,11 @@ func (e *Event) ParseState(tl TypeLookuper) error {
 		err = json.Unmarshal(e.RawState, &s)
 		e.State = &s
 		break	
+	case "ZHALightLevel":
+		var s ZHALightLevel
+		err = json.Unmarshal(e.RawState, &s)
+		e.State = &s
+		break
 	case "Daylight":
 		var s Daylight
 		err = json.Unmarshal(e.RawState, &s)
@@ -160,6 +165,25 @@ type ZHAPresence struct {
 func (z *ZHAPresence) Fields() map[string]interface{} {
 	return map[string]interface{}{
 		"presence": z.presence
+	}
+}
+
+// ZHALightLevel respresents a change from a presence sensor
+type ZHALightLevel struct {
+	State
+	dark bool,
+	daylight bool,
+	lightlevel int,
+	lux int
+}
+
+// Fields returns timeseries data for influxdb
+func (z *ZHALightLevel) Fields() map[string]interface{} {
+	return map[string]interface{}{
+		"dark": z.dark,
+		"daylight": z.daylight,
+		"lightlevel": z.lightlevel,
+		"lux": z.lux
 	}
 }
 
